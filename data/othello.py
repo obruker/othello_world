@@ -112,9 +112,9 @@ class Othello:
                     for t in trash:
                         os.remove(os.path.join(f"./data/{wanna_use}", f))
                     print(f"Deduplicating finished with {len(self.sequences)} games left")
-                    self.val = self.sequences[20000000:]
-                    self.sequences = self.sequences[:20000000]
-                    print(f"Using 20 million for training, {len(self.val)} for validation")
+                    self.val = self.sequences[-1000:]
+                    self.sequences = self.sequences[:-1000]
+                    print(f"Using {len(self.sequences)} for training, {len(self.val)} for validation")
         else:
             for fn in os.listdir(data_root):
                 if criteria(fn):

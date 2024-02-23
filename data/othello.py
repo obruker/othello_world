@@ -101,6 +101,7 @@ class Othello:
                             if len(b) < 9e4:  # should be 1e5 each
                                 trash.append(f)
                                 continue
+                            b = [b_ for b_ in b if b_[0] in [19, 26]]
                             self.sequences.extend(b)
                         process = psutil.Process(os.getpid())
                         mem_gb = process.memory_info().rss / 2 ** 30

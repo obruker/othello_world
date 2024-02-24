@@ -409,6 +409,8 @@ class OthelloBoardState():
 def split_boards(seq):
     return seq if seq[0] in [19, 26] else [t + 64 for t in seq]
 
+def unite_boards(moves):
+    return moves if moves[0] in [19, 26] else [m - 64 for m in moves]
 
 if __name__ == "__main__":
     pass

@@ -101,7 +101,7 @@ class Othello:
                             if len(b) < 9e4:  # should be 1e5 each
                                 trash.append(f)
                                 continue
-                            b = [b_ for b_ in b if b_[0] in [19, 26]]
+                            b = [split_boards(b_) for b_ in b]
                             self.sequences.extend(b)
                         process = psutil.Process(os.getpid())
                         mem_gb = process.memory_info().rss / 2 ** 30
@@ -404,6 +404,11 @@ class OthelloBoardState():
             if prt:
                 self.__print__()
         return container
+
+
+def split_boards(seq):
+    return seq if seq[0] in [19, 26] else [t + 64 for t in seq]
+
 
 if __name__ == "__main__":
     pass

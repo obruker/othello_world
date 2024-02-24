@@ -33,7 +33,7 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 from data import get_othello
-from data.othello import permit, start_hands, OthelloBoardState, permit_reverse, unite_boards
+from data.othello import permit, start_hands, OthelloBoardState, permit_reverse
 from mingpt.dataset import CharDataset
 from mingpt.utils import sample
 from mingpt.model import GPT, GPTConfig
@@ -88,7 +88,7 @@ for whole_game in bar:
         y = sample(model, x, 1, temperature=1.0)[0]
         completion = [train_dataset.itos[int(i)] for i in y if i != -1]
         try:
-            OthelloBoardState().update(unite_boards(completion), prt=False)
+            OthelloBoardState().update(completion, prt=False)
         except Exception:
 #             fail_nodes.append([permit_reverse(_) for _ in context])
             pass

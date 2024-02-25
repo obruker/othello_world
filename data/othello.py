@@ -212,6 +212,7 @@ class OthelloBoardState():
                 self.__print__()
 
     def umpire(self, move):
+        move = move % 64
         r, c = move // 8, move % 8
         assert self.state[r, c] == 0, f"{r}-{c} is already occupied!"
         occupied = np.sum(self.state != 0)

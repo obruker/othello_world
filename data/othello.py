@@ -61,7 +61,7 @@ eights = [[-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1]]
 wanna_use = "othello_synthetic"
 
 class Othello:
-    def __init__(self, ood_perc=0., data_root=None, wthor=False, ood_num=1000):
+    def __init__(self, ood_perc=0., data_root=None, wthor=False, ood_num=1000, nfiles=None):
         # ood_perc: probability of swapping an in-distribution game (real championship game)
         # with a generated legit but stupid game, when data_root is None, should set to 0
         # data_root: if provided, will load pgn files there, else load from data/gen10e5
@@ -87,7 +87,10 @@ class Othello:
                         with open(f'./data/{wanna_use}/gen10e5_{t_start}.pickle', 'wb') as handle:
                             pickle.dump(self.sequences, handle, protocol=pickle.HIGHEST_PROTOCOL)
                 else:
-                    bar = tqdm(os.listdir(f"./data/{wanna_use}"))
+                    train_files = os.listdir(f"./data/{wanna_use}")
+                    if nfiles:
+                        train_files = train_files[:nfiles]
+                    bar = tqdm(train_files)
                     trash = []
                     cnt = 0 
                     for f in bar:
@@ -168,8 +171,8 @@ def get_ood_game(_):
         possible_next_steps = ab.get_valid_moves()
     return tbr
     
-def get(ood_perc=0., data_root=None, wthor=False, ood_num=1000):
-    return Othello(ood_perc, data_root, wthor, ood_num)
+def get(ood_perc=0., data_root=None, wthor=False, ood_num=1000, nfiles=None):
+    return Othello(ood_perc, data_root, wthor, ood_num, nfiles)
     
 class OthelloBoardState():
     # 1 is black, -1 is white

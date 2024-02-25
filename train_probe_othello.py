@@ -70,7 +70,7 @@ if args.championship:
     folder_name = folder_name + "_championship"
 
 print(f"Running experiment for {folder_name}")
-othello = get_othello(data_root="data/othello_championship")
+othello = get_othello(ood_num=-1, data_root=None, wthor=True, nfiles=2)
 
 train_dataset = CharDataset(othello)
 

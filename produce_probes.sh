@@ -6,11 +6,11 @@ do
 #CUDA_VISIBLE_DEVICES=0 python train_probe_othello.py --layer $X
 
 #for Y in {2,4,8,16,32,64,128,256,512}
-for Y in {64,128}
-do
+# do
 #CUDA_VISIBLE_DEVICES=0 python train_probe_othello.py --layer $X --twolayer --mid_dim $layer --random
 #CUDA_VISIBLE_DEVICES=0 python train_probe_othello.py --layer $X --twolayer --mid_dim $layer --championship
-CUDA_VISIBLE_DEVICES=0 python train_probe_othello.py --layer $X --twolayer --mid_dim $Y
-done
+# CUDA_VISIBLE_DEVICES=0 python train_probe_othello.py --layer $X --twolayer --mid_dim $Y
+CUDA_VISIBLE_DEVICES=0 python train_probe_othello.py --layer $X --twolayer --mid_dim 128 --epo 8
+# done
 
 done

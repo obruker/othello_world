@@ -38,7 +38,7 @@ class color:
     UNDERLINE = '\033[4m'
     END = '\033[0m'
 
-# Othello is a strategy board game for two players (Black and White), played on an 8 by 8 board. 
+# Othello is a strategy board game for two players (Black and White), played on an 8 by 8 board.
 # The game traditionally begins with four discs placed in the middle of the board as shown below. Black moves first.
 # W (27) B (28)
 # B (35) W (36)
@@ -92,7 +92,7 @@ class Othello:
                         train_files = train_files[:nfiles]
                     bar = tqdm(train_files)
                     trash = []
-                    cnt = 0 
+                    cnt = 0
                     for f in bar:
                         if not f.endswith(".pickle"):
                             continue
@@ -129,11 +129,12 @@ class Othello:
                     processed = []
                     res = []
                     for game in games:
+                        board = random.randint(0, 1)
                         tba = []
                         for move in game.moves:
                             x = permit(move)
                             if x != -1:
-                                tba.append(x)
+                                tba.append(x + 64 * board)
                             else:
                                 break
                         if len(tba) != 0:
@@ -150,7 +151,7 @@ class Othello:
                     print(f"Loaded {num_psd}/{num_ldd} (qualified/total) sequences from {fn}")
                     self.sequences.extend(processed)
                     self.results.extend(res)
-        
+
     def __len__(self, ):
         return len(self.sequences)
     def __getitem__(self, i):
@@ -159,7 +160,7 @@ class Othello:
         else:
             tbr = self.sequences[i]
         return tbr
-    
+
 def get_ood_game(_):
     tbr = []
     ab = OthelloBoardState()
@@ -170,10 +171,10 @@ def get_ood_game(_):
         ab.update([next_step, ])
         possible_next_steps = ab.get_valid_moves()
     return tbr
-    
+
 def get(ood_perc=0., data_root=None, wthor=False, ood_num=1000, nfiles=None):
     return Othello(ood_perc, data_root, wthor, ood_num, nfiles)
-    
+
 class OthelloBoardState():
     # 1 is black, -1 is white
     def __init__(self, board_size = 8):
@@ -201,7 +202,7 @@ class OthelloBoardState():
         return self.age.flatten().tolist()
     def get_next_hand_color(self, ):
         return (self.next_hand_color + 1) // 2
-    
+
     def update(self, moves, prt=False):
         # takes a new move or new moves and update state
         if prt:
@@ -256,7 +257,7 @@ class OthelloBoardState():
                 assert 0, "Both color cannot put piece, game should have ended!"
             else:
                 assert 0, "Illegal move!"
-                
+
         self.age += 1
         for ff in tbf:
             self.state[ff[0], ff[1]] *= -1
@@ -265,7 +266,7 @@ class OthelloBoardState():
         self.age[r, c] = 0
         self.next_hand_color *= -1
         self.history.append(move)
-        
+
     def __print__(self, ):
         print("-"*20)
         print([permit_reverse(_) for _ in self.history])
@@ -284,7 +285,7 @@ class OthelloBoardState():
         tbp = [str(k) for k in range(1, 9)]
         print(" ".join([" "] + tbp))
         print("-"*20)
-        
+
     def plot_hm(self, ax, heatmap, pdmove, logit=False):
         padding = np.array([0., 0.])
         trs = {-1: r'O', 0: " ", 1: r'X'}
@@ -308,14 +309,14 @@ class OthelloBoardState():
         del cloned
         if logit:
             max_logit = np.max(np.abs(heatmap))
-            sns.heatmap(data=heatmap, cbar=False, xticklabels=list(range(1,9)), 
+            sns.heatmap(data=heatmap, cbar=False, xticklabels=list(range(1,9)),
                         # cmap=LinearSegmentedColormap.from_list("custom_cmap",  ["#D3D3D3", "#3349F2"]),
-                        cmap=sns.color_palette("vlag", as_cmap=True), 
+                        cmap=sns.color_palette("vlag", as_cmap=True),
                         yticklabels=list("ABCDEFGH"), ax=ax, fmt="", square=True, linewidths=.5, vmin=-max_logit, vmax=max_logit, center=0)
         else:
             sns.heatmap(data=heatmap, cbar=False, xticklabels=list(range(1,9)),
                         # cmap=LinearSegmentedColormap.from_list("custom_cmap",  ["#D3D3D3", "#B90E0A"]),
-                        cmap=sns.color_palette("vlag", as_cmap=True), 
+                        cmap=sns.color_palette("vlag", as_cmap=True),
                         yticklabels=list("ABCDEFGH"), ax=ax, fmt="", square=True, linewidths=.5, vmin=-1, vmax=1, center=0)
         ax.set_title(f"Prediction: {text_for_next_color} at " + permit_reverse(pdmove).upper())
         ax.add_patch(Rectangle((pdmove%8, pdmove//8), 1, 1, fill=False, edgecolor='black', lw=2))
@@ -327,7 +328,7 @@ class OthelloBoardState():
         for i in patchList:
             ax.add_collection(i)
         return ax
-        
+
     def tentative_move(self, move):
         # tentatively put a piece, do nothing to state
         # returns 0 if this is not a move at all: occupied or both player have to forfeit
@@ -377,7 +378,7 @@ class OthelloBoardState():
                 return 0
             else:
                 return 2
-        
+
     def get_valid_moves(self, ):
         regular_moves = []
         forfeit_moves = []
@@ -395,7 +396,7 @@ class OthelloBoardState():
             return forfeit_moves
         else:
             return []
- 
+
     def get_gt(self, moves, func, prt=False):
         # takes a new move or new moves and update state
         container = []
@@ -403,7 +404,7 @@ class OthelloBoardState():
             self.__print__()
         for _, move in enumerate(moves):
             self.umpire(move)
-            container.append(getattr(self, func)())  
+            container.append(getattr(self, func)())
             # to predict first y, we need already know the first x
             if prt:
                 self.__print__()

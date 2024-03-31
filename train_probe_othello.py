@@ -70,7 +70,7 @@ if args.championship:
     folder_name = folder_name + "_championship"
 
 print(f"Running experiment for {folder_name}")
-othello = get_othello(ood_num=-1, data_root=None, wthor=True, nfiles=2)
+othello = get_othello(data_root="data/othello_championship")
 
 train_dataset = CharDataset(othello)
 
@@ -89,6 +89,7 @@ if torch.cuda.is_available():
 loader = DataLoader(train_dataset, shuffle=False, pin_memory=True, batch_size=1, num_workers=1)
 act_container = []
 property_container = []
+EMPTY_BOARD_STATE = OthelloBoardState().get_state()
 for x, y in tqdm(loader, total=len(loader)):
     tbf = [train_dataset.itos[_] for _ in x.tolist()[0]]
     valid_until = tbf.index(-100) if -100 in tbf else 999
@@ -96,7 +97,11 @@ for x, y in tqdm(loader, total=len(loader)):
     properties = a.get_gt(tbf[:valid_until], "get_" + args.exp)  # [block_size, ]
     act = model(x.to(device))[0, ...].detach().cpu()  # [block_size, f]
     act_container.extend([_[0] for _ in act.split(1, dim=0)[:valid_until]])
-    property_container.extend(properties)
+    if tbf[0] < 64:
+        property_container.extend([p + EMPTY_BOARD_STATE for p in properties])
+    else:
+        property_container.extend([EMPTY_BOARD_STATE + p for p in properties])
+
     
 age_container = []
 for x, y in tqdm(loader, total=len(loader)):
@@ -104,13 +109,16 @@ for x, y in tqdm(loader, total=len(loader)):
     valid_until = tbf.index(-100) if -100 in tbf else 999
     a = OthelloBoardState()
     ages = a.get_gt(tbf[:valid_until], "get_age")  # [block_size, ]
-    age_container.extend(ages)
+    if tbf[0] < 64:
+        age_container.extend([a + [i+1.] * 64 for i, a in enumerate(ages)])
+    else:
+        age_container.extend([[i+1.] * 64 + a for i, a in enumerate(ages)])
 
 if args.exp == "state":
     probe_class=3
 
 if args.twolayer:
-    probe = BatteryProbeClassificationTwoLayer(device, probe_class=probe_class, num_task=64, mid_dim=args.mid_dim)
+    probe = BatteryProbeClassificationTwoLayer(device, probe_class=probe_class, num_task=128, mid_dim=args.mid_dim)
 else:
     probe = BatteryProbeClassification(device, probe_class=probe_class, num_task=64)
     

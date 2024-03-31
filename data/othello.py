@@ -117,7 +117,7 @@ class Othello:
                     print(f"Deduplicating finished with {len(self.sequences)} games left")
 
                     def to_second_board(seq):
-                        return [t + 64 for t in seq]
+                        return [t if t in [0, 7, 56, 63] else t + 64 for t in seq]
 
                     def split_between_boards(seqs):
                         return [seq if i % 2 == 0 else to_second_board(seq) for i, seq in enumerate(seqs)]

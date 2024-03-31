@@ -129,12 +129,13 @@ class Othello:
                     processed = []
                     res = []
                     for game in games:
-                        board = random.randint(0, 1)
                         tba = []
+                        tba2 = []
                         for move in game.moves:
                             x = permit(move)
                             if x != -1:
-                                tba.append(x + 64 * board)
+                                tba.append(x)
+                                tba2.append(x + 64)
                             else:
                                 break
                         if len(tba) != 0:
@@ -146,6 +147,7 @@ class Othello:
                                 rr = [0, 0]
                             res.append(rr)
                             processed.append(tba)
+                            processed.append(tba2)
 
                     num_psd = len(processed)
                     print(f"Loaded {num_psd}/{num_ldd} (qualified/total) sequences from {fn}")

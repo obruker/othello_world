@@ -128,17 +128,20 @@ class Othello:
                     num_ldd = len(games)
                     processed = []
                     res = []
+                    no_game = True
                     for game in games:
                         tba = []
                         tba2 = []
                         for move in game.moves:
                             x = permit(move)
                             if x != -1:
-                                tba.append(x)
+                                if no_game:
+                                    tba.append(x)
                                 tba2.append(x + 64)
                             else:
                                 break
-                        if len(tba) != 0:
+                        no_game = False
+                        if len(tba2) != 0:
                             try:
                                 rr = [int(s) for s in game.result.split("-")]
                             except:

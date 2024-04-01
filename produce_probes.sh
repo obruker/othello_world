@@ -10,7 +10,7 @@ do
 #CUDA_VISIBLE_DEVICES=0 python train_probe_othello.py --layer $X --twolayer --mid_dim $layer --random
 #CUDA_VISIBLE_DEVICES=0 python train_probe_othello.py --layer $X --twolayer --mid_dim $layer --championship
 # CUDA_VISIBLE_DEVICES=0 python train_probe_othello.py --layer $X --twolayer --mid_dim $Y
-CUDA_VISIBLE_DEVICES=0 python train_probe_othello.py --layer $X --twolayer --mid_dim 128 --epo 8
+CUDA_VISIBLE_DEVICES=0 python train_probe_othello.py --layer $X --twolayer --mid_dim 128 --epo 25
 # done
 
 done

@@ -144,7 +144,7 @@ class Othello:
                             if first_game:
                                 tba.append(x)
                             else:
-                                tba.append(x + 64)
+                                tba.append(x if x in [0, 7, 56, 63] else x + 64)
                         else:
                             break
                     first_game = False

@@ -103,22 +103,22 @@ class Trainer:
                                 num_workers=config.num_workers)
 
             losses = []
-            totals_epoch = np.zeros(60, dtype=float)  # np.array of shape [60], for positions of age 0 to 59
-            hits_epoch = np.zeros(60, dtype=float)  # np.array of shape [60], for positions of age 0 to 59
+            totals_epoch = np.zeros(120, dtype=float)  # np.array of shape [60], for positions of age 0 to 59
+            hits_epoch = np.zeros(120, dtype=float)  # np.array of shape [60], for positions of age 0 to 59
             pbar = tqdm(enumerate(loader), total=len(loader), disable=not prt) if is_train else enumerate(loader)
             for it, (x, y, age) in pbar:
                 x = x.to(self.device)  # [B, f]
-                y = y.to(self.device)  # [B, #task=64] 
+                y = y.to(self.device)  # [B, #task=64]
                 age = age.to(self.device)  # [B, #task=64], in 0--59
 
                 with torch.set_grad_enabled(is_train):
                     logits, loss = model(x, y)
                     loss = loss.mean() # collapse all losses if they are scattered on multiple gpus
                     losses.append(loss.item())
-                    totals_epoch += np.array([torch.sum(age == i).item() for i in range(60)]).astype(float)
+                    totals_epoch += np.array([torch.sum(age == i).item() for i in range(120)]).astype(float)
                     y_hat = torch.argmax(logits, dim=-1, keepdim=False)  # [B, #task]
                     hits = y_hat == y  # [B, #task]
-                    hits_epoch += np.array([torch.sum(hits * (age == i)).item() for i in range(60)]).astype(float)
+                    hits_epoch += np.array([torch.sum(hits * (age == i)).item() for i in range(120)]).astype(float)
                     
                 if is_train:
                     # backprop and update the parameters

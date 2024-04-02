@@ -49,11 +49,12 @@ class Trainer:
             self.device = torch.cuda.current_device()
             self.model = torch.nn.DataParallel(self.model).to(self.device)
 
-    def save_checkpoint(self):
+    def save_checkpoint(self, epoch):
         # DataParallel wrappers keep raw model object in .module attribute
         raw_model = self.model.module if hasattr(self.model, "module") else self.model
-        logger.info("saving %s", self.config.ckpt_path)
-        torch.save(raw_model.state_dict(), self.config.ckpt_path)
+        ckpt_path = f"{self.config.ckpt_path}.{epoch}"
+        logger.info("saving %s", ckpt_path)
+        torch.save(raw_model.state_dict(), ckpt_path)
 
     def train(self):
         model, config = self.model, self.config
@@ -124,9 +125,9 @@ class Trainer:
             # supports early stopping based on the test loss, or just save always if no test set is provided
             if self.config.ckpt_path is not None:
                 if self.test_dataset is None:
-                    self.save_checkpoint()
+                    self.save_checkpoint(epoch + 1)
                     continue
                 if test_loss < best_loss:
                     best_loss = test_loss
-                    self.save_checkpoint()
-                
+                    self.save_checkpoint(epoch + 1)
+

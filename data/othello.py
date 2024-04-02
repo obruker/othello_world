@@ -104,7 +104,6 @@ class Othello:
                             if len(b) < 9e4:  # should be 1e5 each
                                 trash.append(f)
                                 continue
-                            b = [split_boards(b_) for b_ in b]
                             self.sequences.extend(b)
                         process = psutil.Process(os.getpid())
                         mem_gb = process.memory_info().rss / 2 ** 30
@@ -116,8 +115,15 @@ class Othello:
                     for t in trash:
                         os.remove(os.path.join(f"./data/{wanna_use}", f))
                     print(f"Deduplicating finished with {len(self.sequences)} games left")
-                    self.val = self.sequences[-1000:]
-                    self.sequences = self.sequences[:-1000]
+
+                    def to_second_board(seq):
+                        return [t + 64 for t in seq]
+
+                    def split_between_boards(seqs):
+                        return [seq if i % 2 == 0 else to_second_board(seq) for i, seq in enumerate(seqs)]
+
+                    self.val = split_between_boards(self.sequences[-1000:])
+                    self.sequences = split_between_boards(self.sequences[:-1000])
                     print(f"Using {len(self.sequences)} for training, {len(self.val)} for validation")
         else:
             for fn in os.listdir(data_root):
@@ -415,12 +421,6 @@ class OthelloBoardState():
                 self.__print__()
         return container
 
-
-def split_boards(seq):
-    return seq if seq[0] in [19, 26] else [t + 64 for t in seq]
-
-def unite_boards(moves):
-    return moves if moves[0] in [19, 26] else [m - 64 for m in moves]
 
 if __name__ == "__main__":
     pass

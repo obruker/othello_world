@@ -126,42 +126,42 @@ class Othello:
                     self.sequences = split_between_boards(self.sequences[:-1000])
                     print(f"Using {len(self.sequences)} for training, {len(self.val)} for validation")
         else:
-            for fn in os.listdir(data_root):
-                if criteria(fn):
-                    with open(os.path.join(data_root, fn), "r") as f:
-                        pgn_text = f.read()
-                    games = pgn.loads(pgn_text)
-                    num_ldd = len(games)
-                    processed = []
-                    res = []
-                    no_game = True
-                    for game in games:
-                        tba = []
-                        tba2 = []
-                        for move in game.moves:
-                            x = permit(move)
-                            if x != -1:
-                                if no_game:
-                                    tba.append(x)
-                                tba2.append(x + 64)
+            file_names = [fn for fn in os.listdir(data_root) if criteria(fn)]
+            file_names = sorted(file_names)[:nfiles] if nfiles else file_names
+            for fn in file_names:
+                with open(os.path.join(data_root, fn), "r") as f:
+                    pgn_text = f.read()
+                games = pgn.loads(pgn_text)
+                num_ldd = len(games)
+                processed = []
+                res = []
+                first_game = True
+                for game in games:
+                    tba = []
+                    for move in game.moves:
+                        x = permit(move)
+                        if x != -1:
+                            if first_game:
+                                tba.append(x)
                             else:
-                                break
-                        no_game = False
-                        if len(tba2) != 0:
-                            try:
-                                rr = [int(s) for s in game.result.split("-")]
-                            except:
-                                # print(game.result)
-                                # break
-                                rr = [0, 0]
-                            res.append(rr)
-                            processed.append(tba)
-                            processed.append(tba2)
+                                tba.append(x + 64)
+                        else:
+                            break
+                    first_game = False
+                    if len(tba) != 0:
+                        try:
+                            rr = [int(s) for s in game.result.split("-")]
+                        except:
+                            # print(game.result)
+                            # break
+                            rr = [0, 0]
+                        res.append(rr)
+                        processed.append(tba)
 
-                    num_psd = len(processed)
-                    print(f"Loaded {num_psd}/{num_ldd} (qualified/total) sequences from {fn}")
-                    self.sequences.extend(processed)
-                    self.results.extend(res)
+                num_psd = len(processed)
+                print(f"Loaded {num_psd}/{num_ldd} (qualified/total) sequences from {fn}")
+                self.sequences.extend(processed)
+                self.results.extend(res)
 
     def __len__(self, ):
         return len(self.sequences)
